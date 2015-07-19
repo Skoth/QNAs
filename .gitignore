@@ -1,0 +1,14 @@
+# Bower Includes
+bower_components
+
+# Editor Settings
+.settings
+
+# Media Binaries
+media
+
+# Desktop
+*.ini
+
+# Side notes, irrelevant for users
+aside.js

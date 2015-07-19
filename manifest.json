@@ -1,0 +1,35 @@
+{
+  "name": "QNAs",
+  "description": "This QNA System is currently a work-in-progress. Much of the core logic needs to be added.",
+  "version": "0.5",
+  "manifest_version": 2,
+  "permissions": [
+  	"storage",
+  	"tabs"
+  ],
+  "externally_connectable": {
+    // Extension and app IDs. If this field is not specified, no
+    // extensions or apps can connect.
+    // "ids": [],
+    // Match patterns for web pages. Does not affect content scripts.
+    // If this field is not specified, no webpages can connect.
+    // "matches": [],
+    // Indicates that the extension would like to make use of the TLS
+    // channel ID of the web page connecting to it. The web page must
+    // also opt to send the TLS channel ID to the extension via setting
+    // includeTlsChannelId to true in runtime.connect's connectInfo
+    // or runtime.sendMessage's options.
+    "accepts_tls_channel_id": false
+  },
+  "browser_action": {
+    "default_title": "QNAs",
+    "default_icon": {
+      "128": "media/questionmark.png"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "icons": { "128": "media/questionmark.png" },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

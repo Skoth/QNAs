@@ -1,0 +1,35 @@
+<!--<div class="row" ng-show=""-->
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" ng-repeat="qna in qnaSet">
+      <div class="panel panel-{{ ResponseResult[qna.state].panel }}" ng-repeat="qna in qnas" ng-click="alerty">
+        <div class="panel-heading" role="tab" id="heading{{ $index }}"> 
+          <!--<div class="panel-title">-->
+            <div class="media">
+              <div class="media-body panel-title">
+                <h4 class="media-heading">{{ qna.source }}</h4>
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ $index }}" aria-expanded="true" 
+                  aria-controls="collapse{{ $index }}" ng-click="renderQuestion()">
+                  <span class="glyphicon glyphicon-{{ ResponseResult[qna.state].icon }}"></span> {{ qna.q }}
+                </a>
+              </div>
+              <div class="media-right">
+                <button class="btn btn-lg btn-default media-object"><span class="glyphicon glyphicon-edit"></span></button>
+              </div>
+            </div>
+          <!--</div>-->
+        </div>
+        <div id="collapse{{ $index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ $index }}">
+          <div class="panel-body">
+            <p ng-bind-html="qna.a"></p>
+            <form method="post" ng-if="$first">
+			        <textarea id="tinymce-editor"></textarea>
+            </form>
+            <button class="btn btn-success" ng-click="changeState(qna, States.Correct)">Correct!</button> <button ng-click="changeState(qna, States.Wrong)" class="btn btn-danger">Wrong!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>

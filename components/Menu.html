@@ -1,0 +1,32 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+<div class="container">
+	<div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+		<a class="navbar-brand" href="#">&origof; Vulcan &imof;</a>
+	</div>
+	<div id="navbar" class="navbar-collapse collapse">
+		<ul class="nav navbar-nav navbar-left">
+			<li class="dropdown">
+				<a style="cursor:pointer;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">All Topics <span class="caret"></span></a>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav navbar-right">
+			<li ng-class="{ active: $route.current.activeTab == 'quiz' }">
+				<a href="#/quiz" data-target="quiz">
+					<span class="glyphicon glyphicon-question-sign"></span> Start Quiz
+				</a>
+			</li>
+			<li ng-class="{ active: $route.current.activeTab == 'add-qna' }">
+				<a href="#/add-qna" data-target="add-qna">
+					<span class="glyphicon glyphicon-plus-sign"></span> Add QNA
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</nav>
