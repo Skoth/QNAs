@@ -96,9 +96,96 @@
 	});
 	
 	// IndexedDB Factory Service
-	app.factory('qnaDBFactory', function() {
+	app.factory('qnasDBFactory', ['$q', function($q) {
+		var QNASDB = null,
+			self = this;
+
+		self.OpenDB = function() {
+			var deferred = $q.defer(),
+				version = 1;
+			var openRequest = indexedDB.open('QNASDB_' + version, version);
+			
+			openRequest.onupgradeneeded = function(e) {
+				QNASDB = e.target.result;
+				e.target.transaction.onerror = indexedDB.onerror;
+				
+				// TODO: backup for data existing before upgrade
+				// (instead of completely deleting)??
+				if(QNASDB.objectStoreNames.contains('qnas')) {
+					QNASDB.deleteObjectStore('qnas');
+				}
+				if(QNASDB.objectStoreNames.contains('topics')) {
+					QNASDB.deleteObjectStore('topics');
+				}
+				
+				QNASDB.createObjectStore('qnas', { keyPath: 'id' });
+				QNASDB.createObjectStore('topics', { keyPath: 'id'});
+			};
+			
+			openRequest.onsuccess = function(e) {
+				QNASDB = e.target.result;
+				deferred.resolve(e);
+			}
+			
+			openRequest.onerror = function() {
+				deferred.reject(e);
+			}
+			
+			return deferred.promise;
+		}
 		
-	});
+		self.SelectAll = function() {
+			var deferred = $q.defer();
+			
+			if(QNASDB === null) deferred.reject('Error: indexedDB unavailable.');
+			else {
+				// test if qnas & topics combined in array yields results of both
+				var transaction = QNASDB.transaction(['qnas', 'topics'], 'readonly');
+				var qnasStore = transaction.objectStore('qnas');
+				var topicsStore = transaction.objectStore('topics');
+				var netData = { qnas: {}, topics: {} };
+				
+				var keyRange = IDBKeyRange.lowerBound(0);
+				var qnasCursorRequest = qnasStore.openCursor(keyRange);
+				var topicsCursorRequest = topicsStore.openCursor(keyRange);
+				
+				qnasCursorRequest.onsuccess = function(e) {
+					var qnasCursor = e.target.result;
+					if(typeof qnasCursor === 'undefined' || qnasCursor === null)
+						console.log('qnasCursor conditional'); 
+						//deferred.resolve(topics, qnas);
+					else {
+						netData.qnas[qnasCursor.key] = qnasCursor.value;
+						qnasCursor.continue();
+					}
+				};
+				
+				qnasCursorRequest.onerror = function(e) {
+					console.log('qnasCursorRequest error: ', e.value);
+					deferred.reject('qnasCursorRequest error!');
+				};
+				
+				topicsCursorRequest.onsuccess = function(e) {
+					var topicsCursor = e.target.result;
+					if(typeof topicsCursor === 'undefined' || topicsCursor === null) {
+						console.log('topicsCursor conditional');
+						deferred.resolve(netData);
+					} else {
+						netData.topics[topicsCursor.key] = topicsCursor.value;
+						topicsCursor.continue();
+					}
+				};
+				
+				topicsCursorRequest.onerror = function(e) {
+					console.log('topicsCursorRequest error: ', e.value);
+					deferred.reject('topicsCursorRequest error!');
+				}
+			}
+			return deferred.promise;
+		}
+		
+		return self;
+	}]);
 
 	app.directive('navMenu', function() {
 		return {
@@ -176,17 +263,27 @@
 		};
 	});
 
-	app.controller('mainController', function($scope, $route) {
+	app.controller('mainController', function($scope, $route, qnasDBFactory) {
 		$scope.$route = $route;
 		
-		$scope.QNASDB = new IDB('QNASDB', [], 1, { qnas:'qnas', topics:'topics' });
-		$scope.QNASDB.OpenDatabase('qnas', function() {
-			console.log('qnas Store opened');
-		});
-		$scope.QNASDB.OpenDatabase('topics', function() {
-			console.log('topics Store opend');
-		});
-		window.db = $scope.QNASDB;
+		$scope.netData;
+		
+		$scope.getData = function() {
+			qnasDBFactory.SelectAll().then(function(result) {
+				$scope.netData = result;
+			}, function(error) {
+				console.log(error);
+			});
+		};
+		
+		function init() {
+			qnasDBFactory.OpenDB().then(function() {
+				//refresh
+				$scope.getData();
+			});
+		}
+		
+		init();
 	});
 
 	app.directive('qnas', function() {
