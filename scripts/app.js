@@ -132,7 +132,7 @@
 			}
 			
 			return deferred.promise;
-		}
+		};
 		
 		self.SelectAll = function() {
 			var deferred = $q.defer();
@@ -183,16 +183,15 @@
 				}
 			}
 			return deferred.promise;
-		}
+		};
 		self.InsertQNA = function(qna) {
 			var deferred = $q.defer();
 			
-			if(QNASDB === null) deferred.reject('Error: indexedDB unavailable.');
+			if(QNASDB === null) deferred.reject('Error: Database unavailable.');
 			else {
 				// IDBTransaction (handlers: oncomplete, onabort, onerror)
 				var transaction = QNASDB.transaction(['qnas'], 'readwrite'); 
 				var store = transaction.objectStore('qnas');
-				window.qq = store;
 				var addRequest = store.add(qna); // returns IDBRequest (handlers: onsuccess, onerror)
 				
 				addRequest.onsuccess = function(e) {
@@ -203,6 +202,23 @@
 				}
 			}
 			return deferred.promise;
+		};
+		self.UpdateQNA = function(key, qna) {
+			var deferred = $q.defer();
+			
+			if(QNASDB === null) deferred.reject('Error: Database unavailable.');
+			else {
+				var transaction = QNASDB.transaction(['qnas'], 'readwrite');
+				var store = transaction.objectStore('qnas');
+				var getRequest = store.get(key);
+				
+				getRequest.onsuccess = function(e) {
+					var updateTarget = e.target.result;
+					if(typeof updateTarget !== 'undefined') {
+						
+					}
+				}
+			}
 		}
 		
 		return self;
@@ -288,6 +304,8 @@
 		$scope.$route = $route;
 		
 		$scope.netData;
+		
+		$scope.updateMode = false;
 		
 		$scope.getData = function() {
 			qnasDBFactory.SelectAll().then(function(result) {
@@ -399,26 +417,6 @@
 				
 			},
 			controller: 'mainController'
-			// function($scope) {
-				// $scope.qnaContent;
-				// 
-				// $scope.addQNA = function() {
-				// 	var date = new Date();
-				// 	var qna = {
-				// 		content: $scope.qnaContent,
-				// 		insertDate: date,
-				// 		mostRecentModificationDate: date,
-				// 		topic: null,
-				// 		source: null
-				// 	};
-				// 	$scope.QNASDB.Insert('qnas', qna, function(key) {
-				// 		if(typeof key !== 'undefined') {
-				// 			console.log('QNA-' + key, ' added.');
-				// 			console.log(qna.content);
-				// 		} else { console.log('QNA Insertion Error occurred!'); }
-				// 	});
-				// }
-			// }
 		};
 	});
 })();
