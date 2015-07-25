@@ -118,8 +118,8 @@
 					QNASDB.deleteObjectStore('topics');
 				}
 				
-				QNASDB.createObjectStore('qnas', { keyPath: 'id' });
-				QNASDB.createObjectStore('topics', { keyPath: 'id'});
+				QNASDB.createObjectStore('qnas', { autoIncrement: true });
+				QNASDB.createObjectStore('topics', { autoIncrement: true });
 			};
 			
 			openRequest.onsuccess = function(e) {
@@ -146,10 +146,11 @@
 				var netData = { qnas: {}, topics: {} };
 				
 				var keyRange = IDBKeyRange.lowerBound(0);
-				var qnasCursorRequest = qnasStore.openCursor(keyRange);
-				var topicsCursorRequest = topicsStore.openCursor(keyRange);
+				// IDBObjectStore.openCursor() returns IDBRequest object
+				var qnasRequest = qnasStore.openCursor(keyRange);
+				var topicsRequest = topicsStore.openCursor(keyRange);
 				
-				qnasCursorRequest.onsuccess = function(e) {
+				qnasRequest.onsuccess = function(e) {
 					var qnasCursor = e.target.result;
 					if(typeof qnasCursor === 'undefined' || qnasCursor === null)
 						console.log('qnasCursor conditional'); 
@@ -160,12 +161,12 @@
 					}
 				};
 				
-				qnasCursorRequest.onerror = function(e) {
-					console.log('qnasCursorRequest error: ', e.value);
-					deferred.reject('qnasCursorRequest error!');
+				qnasRequest.onerror = function(e) {
+					console.log('qnasRequest error: ', e.value);
+					deferred.reject('qnasRequest error!');
 				};
 				
-				topicsCursorRequest.onsuccess = function(e) {
+				topicsRequest.onsuccess = function(e) {
 					var topicsCursor = e.target.result;
 					if(typeof topicsCursor === 'undefined' || topicsCursor === null) {
 						console.log('topicsCursor conditional');
@@ -176,9 +177,29 @@
 					}
 				};
 				
-				topicsCursorRequest.onerror = function(e) {
-					console.log('topicsCursorRequest error: ', e.value);
-					deferred.reject('topicsCursorRequest error!');
+				topicsRequest.onerror = function(e) {
+					console.log('topicsRequest error: ', e.value);
+					deferred.reject('topicsRequest error!');
+				}
+			}
+			return deferred.promise;
+		}
+		self.InsertQNA = function(qna) {
+			var deferred = $q.defer();
+			
+			if(QNASDB === null) deferred.reject('Error: indexedDB unavailable.');
+			else {
+				// IDBTransaction (handlers: oncomplete, onabort, onerror)
+				var transaction = QNASDB.transaction(['qnas'], 'readwrite'); 
+				var store = transaction.objectStore('qnas');
+				window.qq = store;
+				var addRequest = store.add(qna); // returns IDBRequest (handlers: onsuccess, onerror)
+				
+				addRequest.onsuccess = function(e) {
+					deferred.resolve(e);
+				}
+				addRequest.onerror = function(e) {
+					deferred.reject(e);
 				}
 			}
 			return deferred.promise;
@@ -276,6 +297,24 @@
 			});
 		};
 		
+		$scope.addQNA = function(qnaMdlVal) {
+			var date = new Date();
+			var qna = {
+				content: qnaMdlVal,
+				insertDate: date,
+				mostRecentModificationDate: date,
+				topic: null,
+				source: null
+			};
+			
+			qnasDBFactory.InsertQNA(qna).then(function(result) {
+				window.ress = result;
+				console.log(result);
+			}, function(error) {
+				console.log(error);
+			});
+		};
+		
 		function init() {
 			qnasDBFactory.OpenDB().then(function() {
 				//refresh
@@ -359,26 +398,27 @@
 			link: function($scope, $elem, attrs) {
 				
 			},
-			controller: function($scope) {
-				$scope.qnaContent;
-				
-				$scope.addQNA = function() {
-					var date = new Date();
-					var qna = {
-						content: $scope.qnaContent,
-						insertDate: date,
-						mostRecentModificationDate: date,
-						topic: null,
-						source: null
-					};
-					$scope.QNASDB.Insert('qnas', qna, function(key) {
-						if(typeof key !== 'undefined') {
-							console.log('QNA-' + key, ' added.');
-							console.log(qna.content);
-						} else { console.log('QNA Insertion Error occurred!'); }
-					});
-				}
-			}
+			controller: 'mainController'
+			// function($scope) {
+				// $scope.qnaContent;
+				// 
+				// $scope.addQNA = function() {
+				// 	var date = new Date();
+				// 	var qna = {
+				// 		content: $scope.qnaContent,
+				// 		insertDate: date,
+				// 		mostRecentModificationDate: date,
+				// 		topic: null,
+				// 		source: null
+				// 	};
+				// 	$scope.QNASDB.Insert('qnas', qna, function(key) {
+				// 		if(typeof key !== 'undefined') {
+				// 			console.log('QNA-' + key, ' added.');
+				// 			console.log(qna.content);
+				// 		} else { console.log('QNA Insertion Error occurred!'); }
+				// 	});
+				// }
+			// }
 		};
 	});
 })();
