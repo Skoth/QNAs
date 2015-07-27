@@ -143,7 +143,7 @@
 				var transaction = QNASDB.transaction(['qnas', 'topics'], 'readonly');
 				var qnasStore = transaction.objectStore('qnas');
 				var topicsStore = transaction.objectStore('topics');
-				var netData = { qnas: {}, topics: {} };
+				var netData = { qnas: [], topics: {} };
 				
 				var keyRange = IDBKeyRange.lowerBound(0);
 				// IDBObjectStore.openCursor() returns IDBRequest object
@@ -156,7 +156,7 @@
 						console.log('qnasCursor conditional'); 
 						//deferred.resolve(topics, qnas);
 					else {
-						netData.qnas[qnasCursor.key] = qnasCursor.value;
+						netData.qnas.push({ 'key':qnasCursor.key, 'data':qnasCursor.value });
 						qnasCursor.continue();
 					}
 				};
@@ -307,9 +307,11 @@
 		
 		$scope.updateMode = false;
 		
+		// <indexedDB-interface-code>
 		$scope.getData = function() {
 			qnasDBFactory.SelectAll().then(function(result) {
 				$scope.netData = result;
+				window.$netData = result;
 			}, function(error) {
 				console.log(error);
 			});
@@ -339,6 +341,9 @@
 				$scope.getData();
 			});
 		}
+		// </indexedDB-interface-code>
+		
+		
 		
 		init();
 	});

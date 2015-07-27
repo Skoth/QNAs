@@ -1,4 +1,3 @@
-<!--<div class="row" ng-show=""-->
 <div class="row">
   <div class="col-md-12">
     <button class="btn btn-lg btn-primary center-block" ng-click="updateQNAList">Start Quiz!</button>
@@ -6,7 +5,7 @@
 </div>
 <div class="row">
   <div class="col-md-12">
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" ng-repeat="qna in qnaSet">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" ng-repeat="qna in netData">
       <div class="panel panel-{{ ResponseResult[qna.state].panel }}" ng-repeat="qna in qnas">
         <div class="panel-heading" role="tab" id="heading{{ $index }}"> 
           <!--<div class="panel-title">-->
