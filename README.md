@@ -8,3 +8,6 @@ A user-defined question-and-answer Chrome Extension designed with mathematics an
 This project also makes use of the [textAngular](https://github.com/fraywing/textAngular) project to enable RTE customizable questions-and-answers.
 
 *This is still very much a work-in-progress*, so much of the core logic still needs to be implemented, and a good deal of the code is neither optimized nor organized for best performance and readability, respectively.
+
+Build and run this project on your own system, you will need to install some bower dependencies (bower.json soon to be added to override this requirement):
+`bower install angular angular-route bootstrap MathJax textAngular`
