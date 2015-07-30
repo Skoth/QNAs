@@ -4,7 +4,6 @@ A user-defined question-and-answer Chrome Extension designed with mathematics an
 * Rendering equations via [MathJax](https://www.mathjax.org/)
 * Code I/O formatted with [CodeMirror](https://codemirror.net/)
 * SPA organization through [AngularJS](https://angularjs.org/)
-* RTE Utilizing [textAngular](https://github.com/fraywing/textAngular)
 
 This project also makes use of the [textAngular](https://github.com/fraywing/textAngular) project to enable RTE customizable questions-and-answers.
 
