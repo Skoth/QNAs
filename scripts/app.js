@@ -1,6 +1,6 @@
 (function() {
 	var app = angular.module('Vulcan', ['ngRoute', 'ngSanitize', 'textAngular']);
-
+	// test new system
 	app.config(function($routeProvider, $locationProvider) {
 		// Removes hash from routing (?)
 		// $locationProvider.html5Mode(true);
