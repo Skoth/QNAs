@@ -22,7 +22,7 @@
  */
 
 (function() {
-	var app = angular.module('Vulcan', ['ngRoute', 'ngSanitize', 'textAngular']);
+	var app = angular.module('Vulcan', ['ngRoute', 'ngSanitize', 'textAngular', 'ui.codemirror']);
 	// test new system
 	app.config(function($routeProvider, $locationProvider) {
 		// Removes hash from routing (?)
@@ -326,6 +326,13 @@
 	app.controller('mainController', function($scope, $route, qnasDBFactory) {
 		$scope.textAreaSetup = function($element) {
 			$element.attr('ui-codemirror', '');
+		};
+		
+		$scope.codemirrorEditorOptions = {
+			lineWrapping : true,
+			lineNumbers : true,
+			readOnly: 'cursor',
+			mode: 'xml'	
 		};
 		
 		$scope.$route = $route;

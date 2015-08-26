@@ -19,11 +19,18 @@
 <div class="row">
 	<div class="col-lg-12">
 		<!-- test ui-codemirror package -->
-		<text-angular ng-model="qnaContent" ta-toolbar-class="well well-sm" ng-keydown="" ta-text-editor-setup='textAreaSetup'></text-angular>
+		<text-angular name="test" ta-text-editor-setup="textAreaSetup" ui-codemirror-opts="codemirrorEditorOptions" ng-model="qnaContent" class="ta-root focussed" ta-toolbar-class="well well-sm"></text-angular>
+
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div ui-codemirror ui-codemirror-opts="codemirrorEditorOptions"></div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-lg-12 text-center">
+		
 		<div class="input-group">
 			<span class="input-group-addon">
 				<input type="checkbox" ng-model="updateMode" />
