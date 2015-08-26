@@ -12,3 +12,6 @@ media
 
 # Side notes, irrelevant for users
 aside.js
+
+# Ace
+components/ace-builds
