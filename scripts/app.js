@@ -21,6 +21,16 @@
  * SOFTWARE.
  */
 
+function refreshCodeEditor(lang) {
+	window.codeEditor = ace.edit("codeEditor");
+	window.codeEditor.setTheme("ace/theme/monokai");
+	window.codeEditor.getSession().setMode("ace/mode/" + lang);
+}
+
+function refreshMathJax() {
+	MathJax.Hub.Typeset();
+}
+
 (function () {
 	var app = angular.module('Vulcan', ['ngRoute', 'ngSanitize', 'textAngular']);
 	// test new system
@@ -64,6 +74,7 @@
 							'<div class="modal-header">' +
 							'<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
 							'<h4 class="modal-title text-center">Code Preview</h4>' +
+							'<select id="languages" class="form-control"></select>' +
 							'</div>' +
 							'<div class="modal-body">' +
 							'<div id="codeEditor" style="width:100%; height: 350px;"></div>' +
@@ -76,6 +87,7 @@
 							'</div>' +
 							'</div>' +
 							'');
+						//$('#languages').append('herro!');
 						$('#codeModal').modal({
 							show: false,
 							keyboard: true
@@ -83,7 +95,8 @@
 
 
 						$('#insertCodeBtn').on('click', function () {
-							window.selectTest = self.$editor();
+							var html = self.$editor().html;
+							self.$editor().html = html + $('#codeEditor')[0].outerHTML;
 						});
 					}
 					$('#codeModal').modal('show');
@@ -92,9 +105,7 @@
 
 					$('#codeModal').on('shown.bs.modal', function () {
 						if (typeof ace !== 'undefined') {
-							window.editor = ace.edit("codeEditor");
-							window.editor.setTheme("ace/theme/monokai");
-							window.editor.getSession().setMode("ace/mode/csharp");
+							refreshCodeEditor($('select.languages').val());
 							
 							// Hideous hack to negate blur bug after first character entry on
 							// ace (also mandates focus on ace--as opposed to textAngular--when 
@@ -138,7 +149,7 @@
 							'<p><input id="eqnTextInput" type="text" class="form-control" /></p>' +
 							'</div>' +
 							'<div class="modal-footer">' +
-							'<div class="pull-left"><input id="#inlineEqn" type="checkbox" /> Inline Equation </div>' +
+							'<div class="pull-left"><input id="inlineEqn" type="checkbox" /> Inline Equation </div>' +
 							'<button id="cancelCodeBtn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
 							'<button id="insertEqnBtn" type="button" class="btn btn-primary" data-dismiss="modal">Insert</button>' +
 							'</div>' +
@@ -153,14 +164,17 @@
 
 
 						$('#insertEqnBtn').on('click', function () {
-							window.selectTest = self.$editor();
+							var eqn = document.getElementById('eqnTextInput').value;
+							var html = self.$editor().html;
+							var isInline = document.getElementById('inlineEqn').checked;
+							self.$editor().html = (isInline) ? html + "$$" + eqn + "$$" : html + "$" + eqn + "$";
+							self.$editor.focussed = true;
 							// TODO: use rangy/selection API to insert math content back in text-angular
-							console.log('Insert math content into editor');
 						});
 
 						$('#eqnTextInput').on('keyup', function () {
 							$('#renderedEqn').text('$$' + $(this).val().trim() + '$$');
-							MathJax.Hub.Typeset();
+							refreshMathJax();
 						});
 					}
 					self.$editor.focussed = false;
@@ -218,6 +232,31 @@
 
 			return deferred.promise;
 		};
+		
+		/*
+		self.Select = function(topic) {
+			var deferred = $q.defer();
+			
+			if (QNASDB === null) deferred.reject('Error: indexedDB unavailable');
+			else {
+				var transaction = QNASDB.transaction(['qnas'], 'readonly');
+				var qnasStore = transaction.objectStore('qnas');
+				var qnas = [];
+				
+				var keyRange = IDBKeyRange.lowerBound(0);
+				var qnasRequest = qnaStore.openCursor(keyRange);
+				
+				qnasRequest.onsuccess = function(e) {
+					var qnasCursor = e.target.result;
+					if (typeof qnasCursor === 'undefined' || qnasCursor === null)
+						console.log('qnasCursor conditional');
+					else {
+						qnas.push({ })
+					}
+				}
+			}
+		}
+		*/
 
 		self.SelectAll = function () {
 			var deferred = $q.defer();
@@ -403,13 +442,16 @@
 			});
 		};
 
+		$scope.selectedTopic = null;
+
 		$scope.addQNA = function (qnaMdlVal) {
+			console.log('addQNA()');
 			var date = new Date();
 			var qna = {
 				content: qnaMdlVal,
 				insertDate: date,
 				mostRecentModificationDate: date,
-				topic: null,
+				topic: [$scope.selectedTopic],
 				source: null
 			};
 
@@ -441,12 +483,12 @@
 			link: function ($scope, $elem, attrs) {
 
 			},
-			controller: function ($scope) {
+			controller: function ($scope, qnasDBFactory) {
 				$scope.loc = $scope.$route;
 				$scope.$watch('loc', function (newVal, oldVal) {
 					console.log(newVal, oldVal);
 				});
-				$scope.qnaSet = ['a', 'b', 'c'];
+				$scope.qnaSet = [];
 				$scope.selectedQNA = {
 					qna: null,
 					prev: function () {
@@ -495,6 +537,19 @@
 
 				$scope.changeState = function (qna, newState) {
 					qna.state = newState;
+				};
+				
+				$scope.updateQNAList = function() {
+					console.log('updateQNAList');
+					qnasDBFactory.SelectAll().then(function (result) {
+						if(result.hasOwnProperty('qnas') && Array.isArray(result.qnas)) {
+							$scope.qnaSet = result.qnas;
+						}
+						window.ress = result;
+						console.log(result);
+					}, function(error) {
+						console.error(error);
+					});
 				};
 			}
 		};

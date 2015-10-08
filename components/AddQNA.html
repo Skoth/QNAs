@@ -1,4 +1,13 @@
 <div class="row">
+	<!-- <Topic-Selector> -->
+	<div class="col-md-12">
+		<ul class="nav navbar-nav navbar-left">
+			<li class="dropdown">
+				<a style="cursor:pointer;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">All Topics <span class="caret"></span></a>
+			</li>
+		</ul>
+	</div>
+	<!-- </Topic-Selector> -->
 	<div class="col-md-12">
 		<div class="btn-group">
 			<button class="btn btn-warning">Topic</button>
@@ -29,7 +38,7 @@
 			</span>
 			<input type="text" readonly class="form-control" value="Edit Existing QNAs" />
 			<span class="input-group-btn">
-				<button class="btn btn-default">{{ updateMode ? "Update" : "Add" }} QNA</button>
+				<button class="btn btn-default" ng-click="addQNA(qnaContent)">{{ updateMode ? "Update" : "Add" }} QNA</button>
 			</span>
 		</div>
 	</div>

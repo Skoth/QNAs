@@ -1,17 +1,17 @@
 <div class="row">
   <div class="col-md-12">
-    <button class="btn btn-lg btn-primary center-block" ng-click="updateQNAList">Start Quiz!</button>
+    <button class="btn btn-lg btn-primary center-block" ng-click="updateQNAList()">Start Quiz!</button>
   </div>
 </div>
 <div class="row">
   <div class="col-md-12">
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" ng-repeat="qna in netData">
-      <div class="panel panel-{{ ResponseResult[qna.state].panel }}" ng-repeat="qna in qnas">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-{{ ResponseResult[qna.state].panel }}" ng-repeat="qna in qnaSet">
         <div class="panel-heading" role="tab" id="heading{{ $index }}"> 
           <!--<div class="panel-title">-->
             <div class="media">
               <div class="media-body panel-title">
-                <h4 class="media-heading">{{ qna.source }}</h4>
+                <h4 class="media-heading" ng-bind-html="qna.data.content"></h4>
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ $index }}" aria-expanded="true" 
                   aria-controls="collapse{{ $index }}" ng-click="renderQuestion()">
                   <span class="glyphicon glyphicon-{{ ResponseResult[qna.state].icon }}"></span> {{ qna.q }}
