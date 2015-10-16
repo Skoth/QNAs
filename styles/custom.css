@@ -61,6 +61,10 @@ body {
 	-webkit-animation-iteration-count: infinite;
 }
 
+#columns .lastEntry {
+	margin: 0px 10px 0px 10px;
+}
+
 /* =======================================================
  *					</Global-Styles>
  * ======================================================= */
@@ -259,6 +263,20 @@ none .thumbnail {
 
 #submission-result {
 	display:none;
+}
+
+.over {
+	border : 2px dashed black;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
 }
  /* =======================================================
  *					  </Add-QNA-Styles>

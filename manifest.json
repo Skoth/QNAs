@@ -5,7 +5,8 @@
   "manifest_version": 2,
   "permissions": [
   	"storage",
-  	"tabs"
+  	"tabs",
+    "contextMenus"
   ],
   "externally_connectable": {
     // Extension and app IDs. If this field is not specified, no

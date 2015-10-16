@@ -31,6 +31,10 @@ function refreshMathJax() {
 	MathJax.Hub.Typeset();
 }
 
+function pasteTextFormatter(txt) {
+	return txt.replace(/\n\n.+/gi, '');
+}
+
 (function () {
 	var app = angular.module('Vulcan', ['ngRoute', 'ngSanitize', 'textAngular']);
 	// test new system
@@ -555,11 +559,175 @@ function refreshMathJax() {
 		};
 	});
 
+	app.directive('topicSelector', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'components/TopicSelector.html',
+			link: function($scope, $elem, attrs) {
+				$('.dropdown-menu .lastEntry').click(function(e) {
+					e.stopPropagation();
+				});
+				
+				var dragSrcEl = null;
+
+				function handleDragStart(e) {
+					dragSrcEl = this;
+					
+					e.dataTransfer.effectAllowed = 'move';
+					e.dataTransfer.setData('text/html', this.innerHTML);
+					this.classList.add('moving');
+				}
+				
+				function handleDragOver(e) {
+					if(e.preventDefault) {
+						e.preventDefault();
+					}
+					e.dataTransfer.dropEffect = 'move';
+					
+					return false;
+				}
+				
+				function handleDragEnter(e) {
+					this.classList.add('over');
+				}
+				
+				function handleDragLeave(e) {
+					this.classList.remove('over');
+				}
+				
+				function handleDrop(e) {
+					if(e.stopPropagation) {
+						e.stopPropagation();
+					}
+					this.classList.remove('over');
+					if(dragSrcEl != this) {
+						dragSrcEl.innerHTML = this.innerHTML;
+						this.innerHTML = e.dataTransfer.getData('text/html');
+					}
+					// Insert Topics Data Structure into IndexedDB here
+					return false;
+				}
+				
+				function handleDragEnd(e) {
+					[].forEach.call(cols, function(col) {
+						col.classList.remove('over');
+						col.classList.remove('moving');
+					});
+				}
+				
+				var cols = document.querySelectorAll('#columns .column');
+				[].forEach.call(cols, function(col) {
+					col.addEventListener('dragstart', handleDragStart, false);
+					col.addEventListener('dragenter', handleDragEnter, false);
+					col.addEventListener('dragover', handleDragOver, false);
+					col.addEventListener('dragleave', handleDragLeave, false);
+					col.addEventListener('drop', handleDrop, false);
+					col.addEventListener('dragend', handleDragEnd, false);
+				});
+			},
+			controller: function ($scope, $compile, $route, qnasDBFactory) {
+				$scope.newTopicEntry = function($event) {
+					window.newDataThing = $event.currentTarget;
+					var newTopicButton = $event.currentTarget.parentElement;
+					var txtTopicEntry = $event.currentTarget.parentElement;
+					var newTopicButton = txtTopicEntry.cloneNode(true);
+					txtTopicEntry.innerHTML = '';
+					var txtInputTopic = '<input class="form-control" focuser="focusInput" ng-focus="true" ng-keyup="$event.keyCode == 13 && submitTopicEntry($event)" />'
+					var cmplResult = $compile(txtInputTopic)($scope);
+					angular.element(txtTopicEntry).append(cmplResult);
+					txtTopicEntry.parentElement.appendChild(newTopicButton);
+					$compile(newTopicButton)($scope);
+				};
+				
+				$scope.submitTopicEntry = function($event) {
+					var txtTopicEntry = $event.currentTarget;
+					txtTopicEntry.parentElement.classList.add('column');
+					txtTopicEntry.parentElement.classList.remove('lastEntry', 'text-center');
+					txtTopicEntry.setAttribute('draggable', 'true');
+					var topic = txtTopicEntry.value;
+					txtTopicEntry.outerHTML = '<a href="#">' + topic + '</a>';
+				};
+				
+				$scope.selectedTopic = 'Topics';
+				
+				$scope.updateTopic = function($event) {
+					console.log($event.currentTarget.innerText + 'topic updated!');
+					$scope.selectedTopic = $event.currentTarget.innerText;
+					console.log($scope.selectedTopic);
+				}
+				
+				$scope.topics = {
+					name: 'Topics', // Main "super topic" based on which all others are subtopics
+					subtopics: [
+						{ 
+							name: 'Physics',
+							subtopics: []
+						},
+						{
+							name: 'Chemistry',
+							subtopics: []
+						},
+						{
+							name: 'ECE',
+							subtopics: [
+								{
+									name: 'Digital Logic',
+									subtopics: []
+								},
+								{
+									name: 'Communications',
+									subtopics: [
+										{
+											name: 'Digital Communications',
+											subtopics: []
+										},
+										{
+											name: 'Analog Communications',
+											subtopics: [
+												{
+													name: 'Amplitude Modulation',
+													subtopics: []
+												},
+												{
+													name: 'Angle Modulation',
+													subtopics: []
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+					]
+				};
+				
+				// $scope.
+				
+				$scope.focusInput = true;
+			}
+		};
+	});
+
+	app.directive('focuser', function($timeout) {
+		return {
+			link: function($scope, elem, attrs) {
+				$scope.$watch(attrs.focuser, function(val) {
+					if(val === true) {
+						console.log('value=', val);
+						elem[0].focus();
+						$scope[attrs.focuser]
+					}
+				});
+			}
+		};
+	});
+
 	app.directive('addQna', function () {
 		return {
 			restrict: 'E',
 			templateUrl: 'components/AddQNA.html',
 			link: function ($scope, $elem, attrs) {
+				
 			},
 			controller: 'mainController'
 		};
