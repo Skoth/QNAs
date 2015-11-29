@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="topicNode.html">
-	<li class="dropdown-submenu column" draggable="true" ng-repeat="parentTopic in parentTopics">
-		<a href="#" ng-click="updateTopic($event)">{{parentTopic.name}}</a>
-		<ul class="dropdown-menu" ng-if="parentTopic.subtopics.length > 0" ng-include="'topicNode.html'" ng-init="parentTopics = parentTopic.subtopics">
+	<li class="dropdown-submenu" draggable-topic ng-repeat="parentTopic in parentTopics" ng-init="initAddTopic($last, $event)" ng-click="toggleDragging()">
+		<a ng-click="updateTopic($event)">{{parentTopic.name}}</a>
+		<ul class="dropdown-menu" dragging="toggleDragging()" ng-if="parentTopic.subtopics.length > 0 && !dragging" ng-include="'topicNode.html'" ng-init="parentTopics = parentTopic.subtopics">
 		</ul>
 	</li>
 </script>
@@ -11,12 +11,12 @@
 	<div class="col-md-12">
 		<div class="btn-group">
 			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				{{ selectedTopic }} <span class="caret"></span>
+				{{ selectedTopic || 'Topics' }} <span class="caret"></span>
 			</button>
-			<ul class="dropdown-menu" id="columns" ng-include="'topicNode.html'" ng-init="parentTopics = topics.subtopics">
+			<ul class="dropdown-menu" id="topics" ng-include="'topicNode.html'" ng-init="parentTopics = topics.subtopics">
 				
 				<li class="text-center lastEntry">
-					<a href="#" ng-click="newTopicEntry($event)">
+					<a ng-click="newTopicEntry($event)">
 						<span class="glyphicon glyphicon-plus"></span>
 					</a>
 					
@@ -25,15 +25,3 @@
 		</div>
 	</div>
 </div>
-
-<!--
-<li class="dropdown-submenu column" draggable="true" ng-repeat="topic in topics">
-					<a href="#">{{topic.name}}</a>
-					<ul class="dropdown-menu" ng-show="topic.subtopics.length > 0">
-						<li class="dropdown-submenu" ng-repeat="subtopic in topic.subtopics">
-							{{subtopic.name}}
-						</li>
-						<li class="dropdown-submenu" ng-include="'topicNode.html'"></li>
-					</ul>
-				</li>
--->
