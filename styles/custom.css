@@ -65,6 +65,10 @@ body {
 	margin: 0px 10px 0px 10px;
 }
 
+a[ng-click]{
+    cursor: pointer;
+}
+
 /* =======================================================
  *					</Global-Styles>
  * ======================================================= */
@@ -134,8 +138,8 @@ ul.navbar-nav.nav li a, .thumbnail .caption h2 {
  * ======================================================= */
 
 .spacer {
-	padding-top:50px;
-	padding-bottom:50px;
+	padding-top:30px;
+	padding-bottom:30px;
 }
 
 body {
