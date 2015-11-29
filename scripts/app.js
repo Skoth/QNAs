@@ -562,68 +562,12 @@ function pasteTextFormatter(txt) {
 	app.directive('topicSelector', function() {
 		return {
 			restrict: 'E',
+			scope: {
+				'mainController': '@main'
+			},
 			templateUrl: 'components/TopicSelector.html',
 			link: function($scope, $elem, attrs) {
-				$('.dropdown-menu .lastEntry').click(function(e) {
-					e.stopPropagation();
-				});
 				
-				var dragSrcEl = null;
-
-				function handleDragStart(e) {
-					dragSrcEl = this;
-					
-					e.dataTransfer.effectAllowed = 'move';
-					e.dataTransfer.setData('text/html', this.innerHTML);
-					this.classList.add('moving');
-				}
-				
-				function handleDragOver(e) {
-					if(e.preventDefault) {
-						e.preventDefault();
-					}
-					e.dataTransfer.dropEffect = 'move';
-					
-					return false;
-				}
-				
-				function handleDragEnter(e) {
-					this.classList.add('over');
-				}
-				
-				function handleDragLeave(e) {
-					this.classList.remove('over');
-				}
-				
-				function handleDrop(e) {
-					if(e.stopPropagation) {
-						e.stopPropagation();
-					}
-					this.classList.remove('over');
-					if(dragSrcEl != this) {
-						dragSrcEl.innerHTML = this.innerHTML;
-						this.innerHTML = e.dataTransfer.getData('text/html');
-					}
-					// Insert Topics Data Structure into IndexedDB here
-					return false;
-				}
-				
-				function handleDragEnd(e) {
-					[].forEach.call(cols, function(col) {
-						col.classList.remove('over');
-						col.classList.remove('moving');
-					});
-				}
-				
-				var cols = document.querySelectorAll('#columns .column');
-				[].forEach.call(cols, function(col) {
-					col.addEventListener('dragstart', handleDragStart, false);
-					col.addEventListener('dragenter', handleDragEnter, false);
-					col.addEventListener('dragover', handleDragOver, false);
-					col.addEventListener('dragleave', handleDragLeave, false);
-					col.addEventListener('drop', handleDrop, false);
-					col.addEventListener('dragend', handleDragEnd, false);
-				});
 			},
 			controller: function ($scope, $compile, $route, qnasDBFactory) {
 				$scope.newTopicEntry = function($event) {
@@ -648,13 +592,22 @@ function pasteTextFormatter(txt) {
 					txtTopicEntry.outerHTML = '<a href="#">' + topic + '</a>';
 				};
 				
-				$scope.selectedTopic = 'Topics';
+				$scope.selectedTopic = '';
+				
+				$scope.initAddTopic = function(lastElem, elem) {
+					if (typeof $scope.initAddTopic.myVar === 'undefined' && lastElem) {
+						window.firstLastThing = elem;
+						$scope.initAddTopic.myVar = 1;
+					} else {
+						return false;
+					}
+				};
 				
 				$scope.updateTopic = function($event) {
 					console.log($event.currentTarget.innerText + 'topic updated!');
 					$scope.selectedTopic = $event.currentTarget.innerText;
 					console.log($scope.selectedTopic);
-				}
+				};
 				
 				$scope.topics = {
 					name: 'Topics', // Main "super topic" based on which all others are subtopics
@@ -701,8 +654,6 @@ function pasteTextFormatter(txt) {
 					]
 				};
 				
-				// $scope.
-				
 				$scope.focusInput = true;
 			}
 		};
@@ -732,4 +683,153 @@ function pasteTextFormatter(txt) {
 			controller: 'mainController'
 		};
 	});
+	
+	app.directive('draggableTopic', function($compile) {
+		return {
+			restrict: 'A',
+			scope: {
+				dragging: '&'
+			},
+			link: function($scope, $elem, $attrs, $ctrl) {
+				angular.element($elem).attr('draggable', 'true');
+				
+				// $scope.$watch($attrs.draggableTopic, function(html) {
+				// 	$elem.html(html);
+				// 	$compile($elem.contents())($scope);
+				// })
+				
+				//??
+				$('.dropdown-menu .lastEntry').click(function(e) {
+					e.stopPropagation();
+				});
+				
+				$elem.bind('dragstart', function(e) {
+					e.preventDefault();
+					$(this).children('ul').hide();
+					$scope.dragging = true;
+					window.worbischow = this;
+					// $scope.
+					// window.chooby = $elem;
+					//$scope.$apply()
+				});
+				// 
+				$elem.bind('dragend', function(e) {
+					$scope.dragging = false;
+					$(this).children('ul').show();
+					// window.glorpy = $elem;
+					// window.synekynedodychody = $attrs;
+					// $q = $elem.children()[1];
+					// if(typeof $q !== 'undefined')
+					// 	window.dally = $q;
+						//$scope.apply($)
+				});
+				
+				var dragSrcEl = null;
+
+				function handleDragStart(e) {
+					console.log('dragstart initiated');
+					// $scope.dragging = true;
+					dragSrcEl = this;
+					if(typeof dragSrcEl.children[1] !== 'undefined')
+						dragSrcEl.children[1].hidden = true;
+					
+					e.dataTransfer.effectAllowed = 'move';
+					
+					e.dataTransfer.setData('text/html', this.innerHTML); 
+					this.classList.add('moving');
+					// if(typeof dragSrcEl.children[1] !== 'undefined' && dragSrcEl.children[1].nodeName === 'UL') {
+					// 	this.children[1].classList.remove('dropdown-menu');
+					// }
+				}
+				
+				// MDN: The dragover event is fired when an element or text selection is being dragged 
+				// over a valid drop target (every few hundred milliseconds).
+				function handleDragOver(e) {
+					// if(e.preventDefault) {
+					// 	e.preventDefault();
+					// }
+					
+					if(this.dataset.order && this.dataset.order.indexOf(dragSrcEl.dataset["order"]) > -1) { 
+							console.log('Invalid target!');
+					} else {
+						console.log('Valid target!');
+					}
+					//console.log('dragover: x = ' + e.x + ', y = ' + e.y);
+					//console.log(this.innerHTML) // Do we get the dragInitiator or the over-element?
+					e.dataTransfer.dropEffect = 'move';
+					
+					return false;
+				}
+				
+				// MDN: The dragenter event is fired when a dragged element or text selection enters a 
+				// valid drop target.
+				function handleDragEnter(e) {
+					// if within 3/5 boundary, add sub category parameter list or eat 
+					//console.log('dragenter: x = ' + e.x + ', y = ' + e.y);
+					//console.log(this.innerHTML) // Do we get the dragInitiator or the over-element?
+					this.classList.add('over');
+				}
+				
+				function handleDragLeave(e) {
+					this.classList.remove('over');
+				}
+				
+				function handleDrop(e) {
+					if(e.stopPropagation) {
+						e.stopPropagation();
+					}
+					this.classList.remove('over');
+					
+					if(dragSrcEl != this) {
+						dragSrcEl.innerHTML = this.innerHTML;
+						this.innerHTML = e.dataTransfer.getData('text/html');
+					}
+					// Insert Topics Data Structure into IndexedDB here
+					return false;
+				}
+				
+				function handleDragEnd(e) {
+					dragSrcEl.hidden = false;
+					if(typeof dragSrcEl.children[1] !== 'undefined' && dragSrcEl.children[1].hidden)
+						dragSrcEl.children[1].hidden = false;
+					$scope.dragging = false;
+					[].forEach.call(cols, function(col) {
+						col.classList.remove('over');
+						col.classList.remove('moving');
+					});
+				}
+				
+				var cols = document.querySelectorAll('#topics .dropdown-submenu');
+				[].forEach.call(cols, function(col) {
+					col.addEventListener('dragstart', handleDragStart, false);
+					col.addEventListener('dragenter', handleDragEnter, false);
+					col.addEventListener('dragover', handleDragOver, false);
+					col.addEventListener('dragleave', handleDragLeave, false);
+					col.addEventListener('drop', handleDrop, false);
+					col.addEventListener('dragend', handleDragEnd, false);
+				});
+			},
+			controller: function($scope) {
+				$scope.dragging = false;
+				window.draggy = $scope.dragging;
+				$scope.$watch(function(scope) {
+					return scope.dragging;
+				}, function(newValue, oldValue) {
+					console.log('dragging hath changed from "' + oldValue + '" to "' + newValue + '"');
+				});
+				$scope.toggleDragging = function() {
+					$scope.dragging = !$scope.dragging;
+				}
+			}
+		};
+	});
+	
+	// app.controller('subtopicsNondrag', function() {
+	// 	return {
+	// 		restrict: 'A',
+	// 		controller: function($scope) {
+	// 			
+	// 		}
+	// 	}
+	// });
 })();
