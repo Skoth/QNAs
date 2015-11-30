@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="topicNode.html">
-	<li class="dropdown-submenu" draggable-topic ng-repeat="parentTopic in parentTopics" ng-init="initAddTopic($last, $event)" ng-click="toggleDragging()">
-		<a ng-click="updateTopic($event)">{{parentTopic.name}}</a>
+	<li class="dropdown-submenu" ng-repeat="parentTopic in parentTopics" ng-init="initAddTopic($last, $event)" ng-click="toggleDragging()">
+		<a draggable-topic ng-click="updateTopic($event)">{{parentTopic.name}}</a>
 		<ul class="dropdown-menu" dragging="toggleDragging()" ng-if="parentTopic.subtopics.length > 0 && !dragging" ng-include="'topicNode.html'" ng-init="parentTopics = parentTopic.subtopics">
 		</ul>
 	</li>

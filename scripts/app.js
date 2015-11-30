@@ -703,43 +703,19 @@ function pasteTextFormatter(txt) {
 					e.stopPropagation();
 				});
 				
-				$elem.bind('dragstart', function(e) {
-					e.preventDefault();
-					$(this).children('ul').hide();
-					$scope.dragging = true;
-					window.worbischow = this;
-					// $scope.
-					// window.chooby = $elem;
-					//$scope.$apply()
-				});
-				// 
-				$elem.bind('dragend', function(e) {
-					$scope.dragging = false;
-					$(this).children('ul').show();
-					// window.glorpy = $elem;
-					// window.synekynedodychody = $attrs;
-					// $q = $elem.children()[1];
-					// if(typeof $q !== 'undefined')
-					// 	window.dally = $q;
-						//$scope.apply($)
-				});
-				
 				var dragSrcEl = null;
 
 				function handleDragStart(e) {
-					console.log('dragstart initiated');
-					// $scope.dragging = true;
 					dragSrcEl = this;
-					if(typeof dragSrcEl.children[1] !== 'undefined')
-						dragSrcEl.children[1].hidden = true;
+					if($(dragSrcEl).next().length) {
+						// $(dragSrcEl).next().prop('disabled', true);
+						$(dragSrcEl).next().slideUp();
+					}
 					
 					e.dataTransfer.effectAllowed = 'move';
 					
 					e.dataTransfer.setData('text/html', this.innerHTML); 
 					this.classList.add('moving');
-					// if(typeof dragSrcEl.children[1] !== 'undefined' && dragSrcEl.children[1].nodeName === 'UL') {
-					// 	this.children[1].classList.remove('dropdown-menu');
-					// }
 				}
 				
 				// MDN: The dragover event is fired when an element or text selection is being dragged 
@@ -749,11 +725,11 @@ function pasteTextFormatter(txt) {
 					// 	e.preventDefault();
 					// }
 					
-					if(this.dataset.order && this.dataset.order.indexOf(dragSrcEl.dataset["order"]) > -1) { 
-							console.log('Invalid target!');
-					} else {
-						console.log('Valid target!');
-					}
+					// if(this.dataset.order && this.dataset.order.indexOf(dragSrcEl.dataset["order"]) > -1) { 
+					// 		console.log('Invalid target!');
+					// } else {
+					// 	console.log('Valid target!');
+					// }
 					//console.log('dragover: x = ' + e.x + ', y = ' + e.y);
 					//console.log(this.innerHTML) // Do we get the dragInitiator or the over-element?
 					e.dataTransfer.dropEffect = 'move';
@@ -775,31 +751,34 @@ function pasteTextFormatter(txt) {
 				}
 				
 				function handleDrop(e) {
-					if(e.stopPropagation) {
-						e.stopPropagation();
-					}
+					// if(e.stopPropagation) {
+					// 	e.stopPropagation();
+					// }
+					e.preventDefault();
 					this.classList.remove('over');
 					
 					if(dragSrcEl != this) {
-						dragSrcEl.innerHTML = this.innerHTML;
-						this.innerHTML = e.dataTransfer.getData('text/html');
+						$(dragSrcEl).parent().html(this.innerHTML);
+						$(this).html(e.dataTransfer.getData('text/html'));
+						// dragSrcEl.innerHTML = this.innerHTML;
+						// this.innerHTML = e.dataTransfer.getData('text/html');
 					}
 					// Insert Topics Data Structure into IndexedDB here
 					return false;
 				}
 				
 				function handleDragEnd(e) {
-					dragSrcEl.hidden = false;
-					if(typeof dragSrcEl.children[1] !== 'undefined' && dragSrcEl.children[1].hidden)
-						dragSrcEl.children[1].hidden = false;
-					$scope.dragging = false;
+					if($(dragSrcEl).next().length) {
+						// $(dragSrcEl).next().prop('disabled', false);
+						$(dragSrcEl).next().slideDown();
+					}
 					[].forEach.call(cols, function(col) {
 						col.classList.remove('over');
 						col.classList.remove('moving');
 					});
 				}
 				
-				var cols = document.querySelectorAll('#topics .dropdown-submenu');
+				var cols = document.querySelectorAll('#topics a[draggable-topic]');
 				[].forEach.call(cols, function(col) {
 					col.addEventListener('dragstart', handleDragStart, false);
 					col.addEventListener('dragenter', handleDragEnter, false);
@@ -808,28 +787,88 @@ function pasteTextFormatter(txt) {
 					col.addEventListener('drop', handleDrop, false);
 					col.addEventListener('dragend', handleDragEnd, false);
 				});
-			},
-			controller: function($scope) {
-				$scope.dragging = false;
-				window.draggy = $scope.dragging;
-				$scope.$watch(function(scope) {
-					return scope.dragging;
-				}, function(newValue, oldValue) {
-					console.log('dragging hath changed from "' + oldValue + '" to "' + newValue + '"');
-				});
-				$scope.toggleDragging = function() {
-					$scope.dragging = !$scope.dragging;
-				}
 			}
 		};
 	});
 	
-	// app.controller('subtopicsNondrag', function() {
-	// 	return {
-	// 		restrict: 'A',
-	// 		controller: function($scope) {
-	// 			
-	// 		}
-	// 	}
-	// });
+	app.directive('d3jsGraph', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'components/D3JSGraph.html',
+			link: function($scope, $elem, $attrs) {
+				var data = [
+					{
+						'day':'3',
+						'tasks':'6'
+					},
+					{
+						'day':'5',
+						'tasks':'2'
+					},
+					{
+						'day':'9',
+						'tasks':'13'
+					},
+					{
+						'day':'10',
+						'tasks':'3'
+					},
+					{
+						'day':'12',
+						'tasks':'4'
+					},
+					{
+						'day':'17',
+						'tasks':'15'
+					},
+					{
+						'day':'18',
+						'tasks':'11'
+					},
+					{
+						'day':'20',
+						'tasks':'8'
+					},
+					{
+						'day':'22',
+						'tasks':'4'
+					},
+					{
+						'day':'25',
+						'tasks':'6'
+					},
+					{
+						'day':'28',
+						'tasks':'7'
+					},
+				];
+					
+				var w = 800, h = 600
+				var margin = {
+					top:15, right: 15, bottom: 15, left: 15
+				};
+				
+				var xScale = d3.scale.linear()
+					.domain([0, d3.max(data, function(d) { return d['day']; })])
+					.range([margin.left, w - margin.right]);
+				var yScale = d3.scale.linear()
+					.domain([0, d3.max(data, function(d) { return d['tasks']; })])
+					.range([h - margin.top, margin.bottom]);
+				var xAxis = d3.svg.axis().scale(xScale);
+				var yAxis = d3.svg.axis().scale(yScale); 
+				
+				var svg = d3.select('#d3Container').append('svg')
+					.attr('width', w)
+					.attr('height', h)
+					.append('g')
+						.attr('transform', 'translate(' + w - margin.left + ',' + h - margin.bottom + ')');
+						
+				// X-Axis
+				svg.append('g')
+			},
+			controller: function($scope) {
+				
+			}
+		};
+	})
 })();
