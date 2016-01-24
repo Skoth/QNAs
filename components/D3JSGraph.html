@@ -1,2 +1,21 @@
-<div id="d3Container">
-</div>
+<div id="d3Container"></div>
+<div id="d3"></div>
+<style>
+.circles-1 { 
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPScjZmZmJyAvPgogIDxjaXJjbGUgY3g9IjEiIGN5PSIxIiByPSIxIiBmaWxsPSIjMDAwIi8+Cjwvc3ZnPg=="); 
+  background-repeat: repeat; 
+} 
+</style>
+<svg height="10" width="10" xmlns="http://www.w3.org/2000/svg" version="1.1"> 
+  <defs> 
+    <pattern id="circles-1" patternUnits="userSpaceOnUse" width="10" height="10"> 
+      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPScjZmZmJyAvPgogIDxjaXJjbGUgY3g9IjEiIGN5PSIxIiByPSIxIiBmaWxsPSIjMDAwIi8+Cjwvc3ZnPg==" 
+        x="0" y="0" width="10" height="10">
+      </image> 
+    </pattern> 
+  </defs> 
+</svg>
+<svg height="1250" width="1000" style="float:left" class="pattern-swatch">
+  <rect style="fill:#000;" x="0" y="0" height="250" width="1000">Thingy</rect>
+  <rect style="fill: url(#circles-1) #fff;" x="0" y="250" height="1000" width="1000"></rect>
+</svg>
