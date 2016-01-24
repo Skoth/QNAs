@@ -15,3 +15,6 @@ aside.js
 
 # Ace
 components/ace-builds
+
+# Node
+node_modules
