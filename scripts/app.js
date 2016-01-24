@@ -796,75 +796,52 @@ function pasteTextFormatter(txt) {
 			restrict: 'E',
 			templateUrl: 'components/D3JSGraph.html',
 			link: function($scope, $elem, $attrs) {
-				var data = [
-					{
-						'day':'3',
-						'tasks':'6'
-					},
-					{
-						'day':'5',
-						'tasks':'2'
-					},
-					{
-						'day':'9',
-						'tasks':'13'
-					},
-					{
-						'day':'10',
-						'tasks':'3'
-					},
-					{
-						'day':'12',
-						'tasks':'4'
-					},
-					{
-						'day':'17',
-						'tasks':'15'
-					},
-					{
-						'day':'18',
-						'tasks':'11'
-					},
-					{
-						'day':'20',
-						'tasks':'8'
-					},
-					{
-						'day':'22',
-						'tasks':'4'
-					},
-					{
-						'day':'25',
-						'tasks':'6'
-					},
-					{
-						'day':'28',
-						'tasks':'7'
-					},
-				];
-					
-				var w = 800, h = 600
-				var margin = {
-					top:15, right: 15, bottom: 15, left: 15
-				};
 				
-				var xScale = d3.scale.linear()
-					.domain([0, d3.max(data, function(d) { return d['day']; })])
-					.range([margin.left, w - margin.right]);
-				var yScale = d3.scale.linear()
-					.domain([0, d3.max(data, function(d) { return d['tasks']; })])
-					.range([h - margin.top, margin.bottom]);
-				var xAxis = d3.svg.axis().scale(xScale);
-				var yAxis = d3.svg.axis().scale(yScale); 
-				
-				var svg = d3.select('#d3Container').append('svg')
-					.attr('width', w)
-					.attr('height', h)
-					.append('g')
-						.attr('transform', 'translate(' + w - margin.left + ',' + h - margin.bottom + ')');
-						
-				// X-Axis
-				svg.append('g')
+				// var w = 800, h = 600
+				// var margin = {
+				// 	top:15, right: 15, bottom: 15, left: 15
+				// };
+				// 
+				// var xScale = d3.scale.linear()
+				// 	.domain([0, d3.max(data, function(d) { return d['day']; })])
+				// 	.range([margin.left, w - margin.right]);
+				// var yScale = d3.scale.linear()
+				// 	.domain([0, d3.max(data, function(d) { return d['tasks']; })])
+				// 	.range([h - margin.top, margin.bottom]);
+				// var xAxis = d3.svg.axis().scale(xScale);
+				// var yAxis = d3.svg.axis().scale(yScale); 
+				// 
+				// var svg = d3.select('#d3Container').append('svg')
+				// 	.attr('width', w)
+				// 	.attr('height', h)
+				// 	.append('g')
+				// 		.attr('transform', 'translate(' + w - margin.left + ',' + h - margin.bottom + ')');
+				// 		
+				// // X-Axis
+				// svg.append('g').call(xAxis);
+                // svg.append('g').call(yAxis);
+                // 
+                // var line = d3.svg.line()
+                //     .x(function(d) { return xScale(d.day); })
+                //     .y(function(d) { return yScale(d.tasks); });
+                // 
+                // svg.append('path')
+                //     .datum(data)
+                //     .attr('class', 'line')
+                //     .attr('d', line);
+                    
+                d3.select('#d3')
+                    .style('background-color', 'black')
+                    .selectAll('div')
+                    .data([4, 8, 15, 16, 23, 42])
+                    .enter().append('div')
+                    .style('border', '1px dotted transparent')
+                    .transition().duration(750)
+                    .style('border', '1px dotted slategray')
+                    .style('width', function(d) { return `${d*10}px`})
+                    .style('background-color', function(d) { return `rgb(150, 75, ${ Math.floor(d/45 * 255) })`; })
+                    .style('color', 'white')
+                    .text(function(d) { return d; });
 			},
 			controller: function($scope) {
 				
